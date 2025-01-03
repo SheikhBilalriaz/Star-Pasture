@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
@@ -28,7 +29,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home'; // Default redirect
+    protected $redirectTo = '/login'; // Default redirect
 
     /**
      * Create a new controller instance.
@@ -70,9 +71,9 @@ class RegisterController extends Controller
 
         return User::create([
             'name' => $data['name'],
+            'role' => $role,
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => $role,  // Save the role
         ]);
     }
 
@@ -87,12 +88,12 @@ class RegisterController extends Controller
     {
         // Redirect based on the user's role
         if ($user->role === 'admin') {
-            return redirect('/admin/dashboard');
+            return redirect('/admin/login')->with('status', 'Please verify your email.');
         } elseif ($user->role === 'subscriber') {
-            return redirect('/');
+            return redirect('/login')->with('status', 'Please verify your email.');
         }
 
         // Default redirect if no specific role is found
-        return redirect('/');
+        return redirect('/')->with('status', 'Please verify your email.');
     }
 }

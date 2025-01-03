@@ -54,7 +54,7 @@ class LoginController extends Controller
             return redirect()->route('admin.dashboard');
         } elseif ($user->role === 'subscriber') {
             // Redirect to the home page using the named route
-            return redirect()->route('ront.index');
+            return redirect()->route('front.index');
         }
 
         return redirect('/');

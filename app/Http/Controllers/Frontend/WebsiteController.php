@@ -7,16 +7,11 @@ use Illuminate\Http\Request;
 
 class WebsiteController extends Controller
 {
-
-
-  public function front_site ()
+    public function front_site()
     {
-
         $data = [
-            'title' => 'Star Pasture - Home'
+            'title' => 'Star Pasture'
         ];
-
-        return view('frontend.index' ,$data);
+        return view('frontend.index', $data);
     }
-
 }
