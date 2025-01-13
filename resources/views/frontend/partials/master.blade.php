@@ -68,15 +68,18 @@
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
                         </form>
+                        <a href="javascript:;" class="btn-head">Submit Ad</a>
                     @else
                         <!-- Show login and register options if the user is not logged in -->
                         <a href="{{ route('login') }}" class="btn-head">
                             Login
+                            <i class="fa-solid fa-right-to-bracket" style="color: rgb(234,185,82);"></i>
+                        </a>
+                        <a href="{{ route('register') }}" class="btn-head">
+                            Register
                             <img src="{{ asset('frontend_assets/images/user_icon.png') }}" alt="">
                         </a>
                     @endauth
-
-                    <a href="javascript:;" class="btn-head">Submit Ad</a>
                 </div>
 
             </nav>

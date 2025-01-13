@@ -12,7 +12,7 @@
     <meta name="author" content="pixelstrap">
     <link rel="icon" href="../assets/images/favicon.png" type="image/x-icon">
     <link rel="shortcut icon" href="../assets/images/favicon.png" type="image/x-icon">
-    <title>Star Pasture - Login</title>
+    <title>Star Pasture - Register</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link
@@ -30,7 +30,6 @@
 </head>
 
 <body>
-
     <div class="container-fluid p-0">
         <div class="row m-0">
             <div class="col-12 p-0">
@@ -41,10 +40,14 @@
                                 {{ __('User registered successfully.') }}
                             </div>
                         @endif
-                        <div><a class="logo" href="{{ route('front.index') }}"><img class="img-fluid for-light"
-                                    src="{{ asset('frontend_assets/images/logo.png') }}" alt="looginpage"><img
-                                    class="img-fluid for-dark" src="{{ asset('frontend_assets/images/logo.png') }}"
-                                    alt="looginpage"></a></div>
+                        <div>
+                            <a class="logo" href="{{ route('front.index') }}">
+                                <img class="img-fluid for-light" src="{{ asset('frontend_assets/images/logo.png') }}"
+                                    alt="looginpage">
+                                <img class="img-fluid for-dark" src="{{ asset('frontend_assets/images/logo.png') }}"
+                                    alt="looginpage">
+                            </a>
+                        </div>
                         <div class="login-main">
                             <form class="theme-form" method="POST" action="{{ route('register') }}">
                                 @csrf
@@ -52,14 +55,14 @@
                                 <h4>Create your account</h4>
                                 <p>Enter your personal details to create account</p>
                                 <div class="form-group">
-                                    <label for="name"
-                                        class="col-md-4 col-form-label text-md-start">{{ __('Name') }}</label>
+                                    <label for="name" class="col-md-4 col-form-label text-md-start">
+                                        {{ __('Name') }}
+                                    </label>
                                     <div class="row g-2">
                                         <div class="col-12">
                                             <input id="name" type="text"
                                                 class="form-control @error('name') is-invalid @enderror" name="name"
                                                 value="{{ old('name') }}" required autocomplete="name" autofocus>
-
                                             @error('name')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
@@ -69,12 +72,12 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="email"
-                                        class="col-md-4 col-form-label text-md-start">{{ __('Email Address') }}</label>
+                                    <label for="email" class="col-md-4 col-form-label text-md-start">
+                                        {{ __('Email Address') }}
+                                    </label>
                                     <input id="email" type="email"
                                         class="form-control @error('email') is-invalid @enderror" name="email"
                                         value="{{ old('email') }}" required autocomplete="email">
-
                                     @error('email')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -96,7 +99,6 @@
                                         @enderror
                                     </div>
                                 </div>
-
                                 <div class="form-group">
                                     <label for="password-confirm"
                                         class="col-md-4 col-form-label text-md-start">{{ __('Confirm Password') }}</label>
