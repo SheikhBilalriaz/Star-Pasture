@@ -27,6 +27,21 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('backend_assets/css/style.css') }}">
     <link id="color" rel="stylesheet" href="{{ asset('backend_assets/css/color-1.css') }}" media="screen">
     <link rel="stylesheet" type="text/css" href="{{ asset('backend_assets/css/responsive.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"
+        integrity="sha512-yFjZbTYRCJodnuyGlsKamNE/LlEaEAxSUDe5+u61mV8zzqJVFOH7TnULE2/PP/l5vKWpUNnF4VGVkXh3MjgLsg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
+    <script src="{{ asset('frontend_assets/js/stripe_payment.js') }}"></script>
+    <style>
+        .d-none {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -49,71 +64,92 @@
                             </a>
                         </div>
                         <div class="login-main">
-                            <form class="theme-form" method="POST" action="{{ route('register') }}">
+                            <form id="register-user" class="theme-form" method="POST"
+                                action="{{ route('register') }}">
                                 @csrf
                                 <input type="hidden" name="role" value="subscriber">
-                                <h4>Create your account</h4>
-                                <p>Enter your personal details to create account</p>
-                                <div class="form-group">
-                                    <label for="name" class="col-md-4 col-form-label text-md-start">
-                                        {{ __('Name') }}
-                                    </label>
-                                    <div class="row g-2">
-                                        <div class="col-12">
-                                            <input id="name" type="text"
-                                                class="form-control @error('name') is-invalid @enderror" name="name"
-                                                value="{{ old('name') }}" required autocomplete="name" autofocus>
-                                            @error('name')
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $message }}</strong>
-                                                </span>
-                                            @enderror
-                                        </div>
+                                <input type="hidden" id="stripe_pub_key" name="stripe_pub_key"
+                                    value="{{ config('services.stripe.key') }}">
+                                <div>
+                                    <h4>Create your account</h4>
+                                    <p>Enter your personal details to create an account</p>
+                                    <div class="form-group">
+                                        <label for="name"
+                                            class="col-md-4 col-form-label text-md-start">{{ __('Name') }}</label>
+                                        <input id="name" type="text"
+                                            class="form-control @error('name') is-invalid @enderror require"
+                                            name="name" value="{{ old('name') }}" required autocomplete="name"
+                                            autofocus>
+                                        @error('name')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="email" class="col-md-4 col-form-label text-md-start">
-                                        {{ __('Email Address') }}
-                                    </label>
-                                    <input id="email" type="email"
-                                        class="form-control @error('email') is-invalid @enderror" name="email"
-                                        value="{{ old('email') }}" required autocomplete="email">
-                                    @error('email')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                                <div class="form-group">
-                                    <label for="password"
-                                        class="col-md-4 col-form-label text-md-start">{{ __('Password') }}</label>
-                                    <div class="form-input position-relative">
+                                    <div class="form-group">
+                                        <label for="email"
+                                            class="col-md-4 col-form-label text-md-start">{{ __('Email Address') }}</label>
+                                        <input id="email" type="email"
+                                            class="form-control @error('email') is-invalid @enderror @if ($errors->has('general')) is-invalid @endif require"
+                                            name="email" value="{{ old('email') }}" required
+                                            autocomplete="email">
+                                        @error('email')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                        @if ($errors->has('general'))
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $errors->first('general') }}</strong>
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="password"
+                                            class="col-md-4 col-form-label text-md-start">{{ __('Password') }}</label>
                                         <input id="password" type="password"
-                                            class="form-control @error('password') is-invalid @enderror"
+                                            class="form-control @error('password') is-invalid @enderror require"
                                             name="password" required autocomplete="new-password">
-
                                         @error('password')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
                                             </span>
                                         @enderror
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="password-confirm"
-                                        class="col-md-4 col-form-label text-md-start">{{ __('Confirm Password') }}</label>
-                                    <div class="form-input position-relative">
-                                        <input id="password-confirm" type="password" class="form-control"
+                                    <div class="form-group">
+                                        <label for="password-confirm"
+                                            class="col-md-4 col-form-label text-md-start">{{ __('Confirm Password') }}</label>
+                                        <input id="password-confirm" type="password" class="form-control require"
                                             name="password_confirmation" required autocomplete="new-password">
                                     </div>
+                                    <div class="form-group">
+                                        <label for="card-element"
+                                            class="col-md-4 col-form-label text-md-start">{{ __('Payment Details') }}</label>
+                                        <div id="card-element"
+                                            class="form-control @error('stripeToken') is-invalid @enderror @if ($errors->has('stripe')) is-invalid @endif require">
+                                        </div>
+                                        @error('stripeToken')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                        @if ($errors->has('stripe'))
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $errors->first('stripe') }}</strong>
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="submit" id="next-step"
+                                            class="btn btn-primary btn-block w-100">
+                                            Submit
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="form-group mb-0">
-                                    <button type="submit" class="btn btn-primary btn-block w-100" type="submit">
-                                        {{ __('Register') }} </button>
-                                </div>
-                                <p class="mt-4 mb-0">Already have an account?<a class="ms-2"
-                                        href="{{ route('login') }}">Sign in</a></p>
                             </form>
+                            <p class="mt-4 mb-0">Already have an account?
+                                <a class="ms-2" href="{{ route('login') }}">Sign in</a>
+                            </p>
                         </div>
                     </div>
                 </div>

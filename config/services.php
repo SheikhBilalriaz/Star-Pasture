@@ -38,5 +38,8 @@ return [
     'stripe' => [
         'key' => env('STRIPE_PUB_KEY'),
         'secret' => env('STRIPE_SECRET_KEY'),
+        'annual' => 29.99,
+        'monthly' => 1.99,
+        'listing' => 3.00,
     ],
 ];

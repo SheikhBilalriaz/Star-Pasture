@@ -3,38 +3,39 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\EmailCount;
+use App\Models\PaymentTries;
 use App\Models\User;
+use App\Models\UserPayment;
+use Exception;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Stripe\Charge;
+use Stripe\Customer;
+use Stripe\Stripe;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
+/**
+ * This controller handles the registration of new users,
+ * including payment processing using Stripe, and assigns default roles.
+ */
 class RegisterController extends Controller
 {
-    /*
-    |----------------------------------------------------------------------
-    | Register Controller
-    |----------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users as well as their
-    | validation and creation. By default, this controller uses a trait to
-    | provide this functionality without requiring any additional code.
-    |
-    */
-
     use RegistersUsers;
 
     /**
-     * Where to redirect users after registration.
+     * The redirection path after successful registration.
      *
      * @var string
      */
-    protected $redirectTo = '/login'; // Default redirect
+    protected $redirectTo = '/login';
 
     /**
-     * Create a new controller instance.
-     *
-     * @return void
+     * Constructor to apply the guest middleware.
+     * Ensures only unauthenticated users can access the registration functionality.
      */
     public function __construct()
     {
@@ -42,7 +43,8 @@ class RegisterController extends Controller
     }
 
     /**
-     * Get a validator for an incoming registration request.
+     * Validate the registration request data.
+     * Ensures that all required fields are present and correctly formatted.
      *
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
@@ -53,32 +55,111 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            // If you're adding a role selection, you can validate it like this:
-            'role' => ['required', 'in:admin,subscriber'], // Assuming the role can be either 'admin' or 'subscriber'
+            'role' => ['required', 'in:subscriber'],
+            'stripeToken' => ['required', 'string'],
         ]);
     }
 
     /**
-     * Create a new user instance after a valid registration.
+     * Create a new user instance after validation.
      *
      * @param  array  $data
-     * @return \App\Models\User
+     * @return \App\Models\User|\Illuminate\Http\RedirectResponse
      */
     protected function create(array $data)
     {
-        // Default role is 'subscriber', but you can set it based on the input
-        $role = $data['role'] ?? 'subscriber';  // Use 'subscriber' as default if no role is provided
-
-        return User::create([
-            'name' => $data['name'],
-            'role' => $role,
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        return $this->registerUser($data);
     }
 
     /**
-     * The user has been successfully registered.
+     * Handle user registration, including Stripe integration and user creation.
+     * This method also ensures transactional consistency using database transactions.
+     *
+     * @param  array  $data
+     * @return \App\Models\User|\Illuminate\Http\RedirectResponse
+     */
+    protected function registerUser(array $data)
+    {
+        Stripe::setApiKey(config('services.stripe.secret'));
+        DB::beginTransaction();
+
+        try {
+            // Create a Stripe customer
+            $customer = Customer::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'source' => $data['stripeToken'],
+            ]);
+
+            // Process the payment
+            $charge = Charge::create([
+                'customer' => $customer->id,
+                'amount' => config('services.stripe.annual') * 100,
+                'currency' => 'usd',
+                'description' => 'Annual Subscription Fee',
+            ]);
+
+            // Check if the charge was successful
+            if ($charge->status !== 'succeeded') {
+                DB::rollBack();
+                return redirect()->back()
+                    ->withErrors(['stripe' => 'Payment processing failed. Please try again.'])
+                    ->withInput();
+            }
+
+            // Create the user in the database
+            $user = User::create([
+                'name' => $data['name'],
+                'role' => $data['role'] ?? 'subscriber',
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'is_active' => true,
+                'subscription_expires_on' => now()->addYear(),
+                'stripe_customer_id' => $customer->id,
+                'monthly_activation_expires_on' => now()->addMonth(),
+            ]);
+
+            // Record the payment details
+            UserPayment::create([
+                'user_id' => $user->id,
+                'transaction_id' => $charge->id,
+                'amount' => $charge->amount / 100,
+                'currency' => $charge->currency,
+                'payment_type' => 'annual',
+            ]);
+
+            // Initialize payment tries for the user
+            PaymentTries::create([
+                'user_id' => $user->id,
+                'failed_tries' => 0,
+            ]);
+
+            // Initialize email count for the user
+            EmailCount::create([
+                'user_id' => $user->id,
+                'email_count' => 0,
+            ]);
+
+            DB::commit();
+            return $user;
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            Log::error('Stripe API error during registration: ' . $e->getMessage());
+            DB::rollBack();
+            return redirect()->back()
+                ->withErrors(['stripe' => 'Payment processing failed. Please try again.'])
+                ->withInput();
+        } catch (Exception $e) {
+            Log::error('Registration failed: ' . $e->getMessage());
+            DB::rollBack();
+            return redirect()->back()
+                ->withErrors(['general' => 'An error occurred during registration. Please try again.'])
+                ->withInput();
+        }
+    }
+
+    /**
+     * Handle post-registration redirection logic based on user roles.
+     * Ensures users are redirected to the appropriate page after registration.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\User  $user
@@ -86,14 +167,17 @@ class RegisterController extends Controller
      */
     protected function registered(Request $request, $user)
     {
-        // Redirect based on the user's role
-        if ($user->role === 'admin') {
-            return redirect('/admin/login')->with('status', 'Please verify your email.');
-        } elseif ($user->role === 'subscriber') {
-            return redirect('/login')->with('status', 'Please verify your email.');
+        if (!$user instanceof User) {
+            return $user;
         }
 
-        // Default redirect if no specific role is found
+        // Redirect based on user role
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.login')->with('status', 'Please verify your email.');
+        } elseif ($user->role === 'subscriber') {
+            return redirect()->route('login')->with('status', 'Please verify your email.');
+        }
+
         return redirect('/')->with('status', 'Please verify your email.');
     }
 }
