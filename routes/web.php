@@ -8,11 +8,16 @@ use App\Http\Controllers\Payment\AnnualPaymentController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Client\Request;
 
-Route::get('/' ,[WebsiteController::class, 'front_site'])->name('front.index');
+Route::get('/', [WebsiteController::class, 'front_site'])->name('front.index');
 
 Auth::routes(['verify' => true]);
 
-Route::get('/annual-payment/{email}', [AnnualPaymentController::class, 'annualPaymentForm'])->name('annual_payment.form');
+Route::get('/annual-payment/{email}', [AnnualPaymentController::class, 'annual_payment_form'])
+    ->where('email', '.*')
+    ->name('annual_payment.form');
+
+Route::post('/annual-payment/{email}', [AnnualPaymentController::class, 'annual_payment_form_submit'])
+    ->name('annual_payment.submit');
 
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 

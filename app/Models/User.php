@@ -57,6 +57,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'subscription_expires_on' => 'datetime',
     ];
 
     /**
@@ -114,7 +115,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendAnnualSubscriptionNotification()
     {
         // Encrypt the user's email
-        $encryptedEmail = Crypt::encryptString($this->email);
+        $encryptedEmail = urlencode(Crypt::encryptString($this->email));
 
         // Generate the URL with the encrypted email
         $paymentUrl = route('annual_payment.form', ['email' => $encryptedEmail]);

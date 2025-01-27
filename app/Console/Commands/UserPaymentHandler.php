@@ -28,15 +28,6 @@ class UserPaymentHandler extends Command
      */
     public function handle()
     {
-        // Expired subscription users
-        // $users_subscription_expired = User::where('subscription_expires_on', '<=', now())->get();
-
-        // foreach ($users_subscription_expired as $user) {
-        //     $user->is_active = false;
-        //     $user->save();
-        //     //TODO: Send reminder for payment renewal
-        // }
-
         // $user_monthly_expiry = User::where('monthly_activation_expires_on', '<=', now())
         //     ->where('subscription_expires_on', '>', now())
         //     ->get();
