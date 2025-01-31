@@ -20,6 +20,7 @@
             <p style="font-size:1em;color:#555">
                 We hope you’ve been enjoying Star Pasture! This is a friendly reminder that your subscription is due for
                 renewal.
+                <br>
                 To continue enjoying uninterrupted access, please complete your payment at the earliest.
             </p>
             <div style="margin:20px 0;text-align:center">
@@ -30,8 +31,13 @@
             </div>
         </div>
         <p style="font-size:1em;color:#555">Thank you for being a valued part of Star Pasture!</p>
-        <p>For support, contact us at <a href="mailto:starpasture@gmail.com" style="color:#4caf50;text-decoration:none"
-                rel="noreferrer" target="_blank">starpasture@gmail.com</a></p>
+        <p>
+            For support, contact us at
+            <a href="mailto:starpasture@gmail.com" style="color:#4caf50;text-decoration:none" rel="noreferrer"
+                target="_blank">
+                starpasture@gmail.com
+            </a>
+        </p>
     </div>
 </body>
 
