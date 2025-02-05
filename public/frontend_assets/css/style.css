@@ -572,6 +572,17 @@ header#masthead ul#menu-main-menu li {
   border-radius: 100%;
 }
 
+.xtra_links .btn_circle span {
+  margin-left: 10px;
+  display: inline-block;
+}
+
+.xtra_links a.btn-circle {
+  margin-left: 0;
+  display: inline-block;
+  margin-left: 40px;
+}
+
 .secBanner {
   padding-top: 275px;
   padding-bottom: 267px;

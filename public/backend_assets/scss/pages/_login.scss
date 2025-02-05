@@ -11,6 +11,7 @@
   background: url('../images/login/login_bg.jpg');
   background-position: center;
   padding: 30px 12px;
+  height: auto;
 
   .logo {
     display: block;
@@ -106,13 +107,15 @@
         top: 10px;
         right: 0;
       }
-      .social{
-        .btn{
-          &:hover{
+
+      .social {
+        .btn {
+          &:hover {
             background-color: var(--theme-deafult);
             border-color: var(--theme-deafult);
             color: $white !important;
-            .feather{
+
+            .feather {
               color: $white !important;
             }
           }
