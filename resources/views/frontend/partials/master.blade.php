@@ -60,9 +60,11 @@
                             <!-- Display logged-in user's name -->
                             <span>{{ auth()->user()->name }}</span>
                         </a>
-                        <a href="{{ route('logout') }}" class="btn-circle"
-                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            <img src="{{ asset('frontend_assets/images/logout_icon.png') }}" alt="Logout">
+                        <a href="https://star-pasture.dev.internalstaging.com/logout" class="btn-circle"
+                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                            style="width: 20px; height: 20px;">
+                            <img src="https://star-pasture.dev.internalstaging.com/frontend_assets/images/logout_icon.png"
+                                alt="Logout">
                         </a>
                         <!-- Logout form -->
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
