@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Frontend\WebsiteController;
+use App\Http\Controllers\Listing\AdListingController;
 use App\Http\Controllers\Payment\AnnualPaymentController;
 use App\Http\Controllers\Payment\MonthlyPaymentController;
 
@@ -24,6 +25,12 @@ Route::get('/monthly-payment/{email}', [MonthlyPaymentController::class, 'monthl
 
 Route::post('/monthly-payment/{email}', [MonthlyPaymentController::class, 'monthly_payment_form_submit'])
     ->name('monthly_payment.submit');
+
+Route::get('/ad-listing', [AdListingController::class, 'ad_listing_form'])->name('ad_listing.form');
+
+Route::post('/ad-listing', [AdListingController::class, 'ad_listing_form_submit'])->name('ad_listing.submit');
+
+Route::get('/ad-listing/{id}', [AdListingController::class, 'show'])->name('ad_listing.show');
 
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 

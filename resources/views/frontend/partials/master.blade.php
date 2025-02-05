@@ -68,7 +68,7 @@
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
                         </form>
-                        <a href="javascript:;" class="btn-head">Submit Ad</a>
+                        <a href="{{ route('ad_listing.form') }}" class="btn-head">Submit Ad</a>
                     @else
                         <!-- Show login and register options if the user is not logged in -->
                         <a href="{{ route('login') }}" class="btn-head">

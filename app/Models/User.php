@@ -97,6 +97,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the ad listings for the user.
+     */
+    public function adListings()
+    {
+        return $this->hasMany(AdListing::class);
+    }
+
+    /**
      * Generate a verification URL with expiration time (15 minutes)
      * and send the verification email to the user.
      *
