@@ -569,7 +569,6 @@ header#masthead ul#menu-main-menu li {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #000;
   border-radius: 100%;
 }
 
