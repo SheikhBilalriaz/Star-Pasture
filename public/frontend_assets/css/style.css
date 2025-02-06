@@ -600,7 +600,7 @@ header#masthead ul#menu-main-menu li {
   font-size: 18px;
   line-height: 31px;
   margin-bottom: 30px;
-  color: #C08C0B;
+  color: #000;
   padding: 0 9%;
 }
 
@@ -791,12 +791,12 @@ header#masthead ul#menu-main-menu li {
 }
 
 .top_head h2 {
-  font-size: 50px;
+  font-size: 40px;
   line-height: 72px;
-  text-transform: uppercase;
   font-weight: 700;
   color: #000;
   margin: 0;
+  text-transform: capitalize;
 }
 
 .top_head {
