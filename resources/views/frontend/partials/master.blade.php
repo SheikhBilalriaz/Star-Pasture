@@ -52,20 +52,25 @@
                         </li>
                     </ul>
                 </div>
-                <div class="xtra_links">
+                <div class="xtra_links @auth logged_in_user @endauth "   @auth id="logged_in_user" @endauth>
                     <!-- Check if the user is authenticated -->
                     @auth
-                        <a href="javascript:;" class="btn-user btn_circle">
+                        <a href="javascript:;" class="btn-user btn_circle user_inf">
                             <img src="{{ asset('frontend_assets/images/user_icon.png') }}" alt="">
                             <!-- Display logged-in user's name -->
-                            <span>{{ auth()->user()->name }}</span>
                         </a>
-                        <a href="https://star-pasture.dev.internalstaging.com/logout" class="btn-circle"
+                         <ul class="inf_log">
+                         <li><span>{{ auth()->user()->name }}</span></li>    
+                         <li> <a href="https://star-pasture.dev.internalstaging.com/logout" class="btn-circle"
                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                             style="width: 20px; height: 20px;">
                             <img src="https://star-pasture.dev.internalstaging.com/frontend_assets/images/logout_icon.png"
                                 alt="Logout">
-                        </a>
+                        </a></li>
+                         </ul>
+                         
+                         
+                       
                         <!-- Logout form -->
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
@@ -167,6 +172,11 @@
                 $(this).find('.txt').text('Show More');
                 $(this).removeClass('show_less');
             });
+            
+            $('.logged_in_user .btn_circle').on('click',function(){
+                // $('.logged_in_user  ul').toggleClass('showinf');
+                $('.logged_in_user  ul').fadeToggle(500)
+            })
 
         });
     </script>

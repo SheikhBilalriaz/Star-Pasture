@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Backend\AdminController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Frontend\WebsiteController;
@@ -26,11 +27,11 @@ Route::get('/monthly-payment/{email}', [MonthlyPaymentController::class, 'monthl
 Route::post('/monthly-payment/{email}', [MonthlyPaymentController::class, 'monthly_payment_form_submit'])
     ->name('monthly_payment.submit');
 
-Route::get('/ad-listing', [AdListingController::class, 'ad_listing_form'])->name('ad_listing.form');
-
-Route::post('/ad-listing', [AdListingController::class, 'ad_listing_form_submit'])->name('ad_listing.submit');
-
-Route::get('/ad-listing/{id}', [AdListingController::class, 'show'])->name('ad_listing.show');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/ad-listing', [AdListingController::class, 'ad_listing_form'])->name('ad_listing.form');
+    Route::post('/ad-listing', [AdListingController::class, 'ad_listing_form_submit'])->name('ad_listing.submit');
+    Route::get('/ad-listing/{id}', [AdListingController::class, 'show'])->name('ad_listing.show');
+});
 
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
@@ -40,6 +41,6 @@ Route::get('/ad-listing/{id}', [AdListingController::class, 'show'])->name('ad_l
 //     });
 // });
 
-// Route::middleware(['auth', 'role:admin'])->group(function () {
-//     Route::get('/admin-dashboard' ,[AdminController::class , 'account_dashboard'])->name('admin.dashboard');
-// });
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin-dashboard', [AdminController::class, 'account_dashboard'])->name('admin.dashboard');
+});
